@@ -1,7 +1,6 @@
 export interface ICardsData {
   total: number;
-  cards: ICard[] | IResponceError[];
-  getCard(cardId: string): ICard;
+  items: ICard[] | IResponceError[];
 }
 
 export interface ICard {
@@ -11,14 +10,11 @@ export interface ICard {
   title: string;
   category: string;
   price: number | null;
-  putCardToBasket(cardData: TCardBasket): void;
 }
 
 export interface IBasket {
   items: TCardBasket[];
   total: number;
-  removeCardFromBasket(cardId: string): void;
-  createOrder(items: TCardBasket[]): void;
 }
 
 export interface IOrder {
@@ -28,8 +24,6 @@ export interface IOrder {
   address: string;
   total: number;
   items: string[];
-  checkContactsValidation(fieldsToValidate: string[]): void;
-  sendOrder(order: IOrder): IOrderResponce | IResponceError;
 }
 
 export interface IOrderResponce {
