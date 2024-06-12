@@ -151,7 +151,7 @@ events.on('order:paymentCard', () => {
 });
 
 // Изменился способ оплаты заказа на cash
-events.on('order:paymentCard', () => {
+events.on('order:paymentCash', () => {
   orderData.payment = 'offline';
 });
 

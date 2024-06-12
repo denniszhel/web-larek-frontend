@@ -1,15 +1,12 @@
 import {Component} from "../base/Component";
 import {ensureElement} from "../../utils/utils";
-
-interface ISuccess {
-    total: number;
-}
+import { IOrderResponce } from "../../types";
 
 interface ISuccessActions {
     onClick: () => void;
 }
 
-export class Success extends Component<ISuccess> {
+export class Success extends Component<IOrderResponce> {
     protected _total: HTMLElement;
     protected _close: HTMLButtonElement;
 
