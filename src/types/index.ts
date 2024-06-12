@@ -1,8 +1,3 @@
-export interface ICardsData {
-  total: number;
-  items: ICard[] | IResponceError[];
-}
-
 export interface ICard {
   id: string;
   description: string;
@@ -31,15 +26,19 @@ export interface IOrderResponce {
   total: number;
 }
 
-export interface IResponceError {
-  error: string;
-}
-
-export type TCardCatalog = Pick<ICard, 'id' | 'image' | 'title' | 'category' | 'price'>;
 export type TCardBasket = Pick<ICard, 'id' | 'title' | 'price'>;
 
 export type TPaymentMethod = 'online' | 'offline';
-export type TOrderCheckout = Pick<IOrder, 'payment' | 'address' | 'items'>;
-export type TOrderContacts = Pick<IOrder, 'email' | 'phone' | 'items'>;
+
+export interface IOrderForm {
+  address: string;
+}
+
+export interface IContactsForm {
+  email: string;
+  phone: string;
+}
+
+export type FormErrors = Partial<Record<keyof IOrder, string>>;
 
 
