@@ -18,6 +18,15 @@ export class Card extends Component<ICard> {
   protected _price: HTMLElement;
   protected _button: HTMLButtonElement;
 
+  // описания категории
+  protected _categoryColor = <Record<string, string>> { 
+    "софт-скил": "soft",
+    "другое": "other",
+    "дополнительное": "additional",
+    "кнопка": "button",
+    "хард-скил": "hard"
+  }
+
   constructor(container: HTMLElement | HTMLButtonElement, options?: ICardOptions) {
     super(container);
     this._title = ensureElement<HTMLElement>('.card__title', container);
@@ -27,7 +36,7 @@ export class Card extends Component<ICard> {
     if (options) {
       if ('basketIndex' in options && options.basketIndex) {
         this._basketItemIndex = container.querySelector('.basket__item-index');
-        this._basketItemIndex.textContent = options.basketIndex.toString();
+        this.setText(this._basketItemIndex, options.basketIndex.toString());
       }
       if (options.onClickButton === 'open') {
         this._button = container as HTMLButtonElement;
@@ -37,7 +46,7 @@ export class Card extends Component<ICard> {
         this._button = container.querySelector('.basket__item-delete');
       }
       this._button.addEventListener('click', options.onClick);
-      this._button.disabled = 'itemInBasket' in options && options.itemInBasket;
+      this.setDisabled(this._button, 'itemInBasket' in options && options.itemInBasket);
     }  
   }
 
@@ -59,7 +68,7 @@ export class Card extends Component<ICard> {
 
   set category(value: string) {
     this.setText(this._category, value);
-    this._category.classList.add(this.getCategoryStyle(value));
+    this.toggleClass(this._category, `card__category_${this._categoryColor[value]}`, true)
   }
 
   get category(): string {
@@ -84,24 +93,6 @@ export class Card extends Component<ICard> {
   
   set image(value: string) {
       this.setImage(this._image, value, this.title)
-  }
-
-  private getCategoryStyle(categoryValue: string): string {
-    if (categoryValue.indexOf('софт') !== -1) {
-      return 'card__category_soft';
-    }
-    if (categoryValue.indexOf('хард') !== -1) {
-      return 'card__category_hard';
-    }
-    if (categoryValue.indexOf('другое') !== -1) {
-      return 'card__category_other';
-    }
-    if (categoryValue.indexOf('дополнительное') !== -1) {
-      return 'card__category_additional';
-    }
-    if (categoryValue.indexOf('кнопка') !== -1) {
-      return 'card__category_button';
-    }
   }
 
 }

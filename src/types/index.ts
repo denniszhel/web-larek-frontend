@@ -31,6 +31,7 @@ export type TCardBasket = Pick<ICard, 'id' | 'title' | 'price'>;
 export type TPaymentMethod = 'online' | 'offline';
 
 export interface IOrderForm {
+  payment: TPaymentMethod;
   address: string;
 }
 

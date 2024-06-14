@@ -1,6 +1,7 @@
-import {Component} from "./base/Component";
-import {IEvents} from "./base/EventsTemp";
-import {ensureElement} from "../utils/utils";
+import { Component } from "./base/Component";
+import { IEvents } from "./base/Events";
+import { ensureElement } from "../utils/utils";
+import { EventName } from "../utils/constants";
 
 interface IPage {
     counter: number;
@@ -24,7 +25,7 @@ export class Page extends Component<IPage> {
         this._basket = ensureElement<HTMLElement>('.header__basket');
 
         this._basket.addEventListener('click', () => {
-            this.events.emit('basket:open');
+            this.events.emit(EventName.basketOpen);
         });
     }
 
@@ -37,10 +38,6 @@ export class Page extends Component<IPage> {
     }
 
     set locked(value: boolean) {
-        if (value) {
-            this._wrapper.classList.add('page__wrapper_locked');
-        } else {
-            this._wrapper.classList.remove('page__wrapper_locked');
-        }
+        this.toggleClass(this._wrapper, 'page__wrapper_locked', value);
     }
 }

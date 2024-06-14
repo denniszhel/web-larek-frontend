@@ -1,6 +1,7 @@
-import {Component} from "../base/Component";
-import {ensureElement} from "../../utils/utils";
-import {IEvents} from "../base/EventsTemp";
+import { Component } from "../base/Component";
+import { ensureElement } from "../../utils/utils";
+import { IEvents } from "../base/Events";
+import { EventName } from "../../utils/constants"
 
 interface IModalData {
     content: HTMLElement;
@@ -25,15 +26,27 @@ export class Modal extends Component<IModalData> {
         this._content.replaceChildren(value);
     }
 
+    private toggleModal(state: boolean = true) {
+        this.toggleClass(this.container, 'modal_active', state);
+    }
+
+    private handleEscape = (evt: KeyboardEvent) => {
+        if (evt.key === 'Escape') {
+            this.close();
+        }
+    };
+
     open() {
-        this.container.classList.add('modal_active');
-        this.events.emit('modal:open');
+        this.toggleModal(true);
+        document.addEventListener('keydown', this.handleEscape);
+        this.events.emit(EventName.modalOpen);
     }
 
     close() {
-        this.container.classList.remove('modal_active');
-        this._content.replaceChildren();
-        this.events.emit('modal:close');
+        this.toggleModal(false);
+        document.removeEventListener('keydown', this.handleEscape);
+        this.content = null;
+        this.events.emit(EventName.modalClose);
     }
 
     render(data: IModalData): HTMLElement {

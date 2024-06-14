@@ -2,7 +2,7 @@ import './scss/styles.scss';
 
 import { AppApi } from './components/AppApi';
 import { API_URL, CDN_URL } from "./utils/constants";
-import { EventEmitter } from "./components/base/EventsTemp";
+import { EventEmitter } from "./components/base/Events";
 import { CardsData, BasketData, OrderData } from './components/AppData';
 import { ICard, TCardBasket, IOrderForm, IContactsForm, IOrderResponce } from './types';
 import { Page } from "./components/Page";
@@ -11,8 +11,9 @@ import { Modal } from "./components/common/Modal";
 import { Basket } from "./components/Basket";
 import { Order } from "./components/Order";
 import { Contacts } from "./components/Contacts";
-import { Success } from "./components/common/Success";
+import { Success } from "./components/Success";
 import { cloneTemplate, ensureElement } from './utils/utils';
+import { EventName } from './utils/constants';
 
 const events = new EventEmitter();
 const api = new AppApi(CDN_URL, API_URL);
@@ -38,10 +39,10 @@ const successTemplate = ensureElement<HTMLTemplateElement>('#success');
 const orderForm = new Order(cloneTemplate(orderTemplate), events);
 const contactsForm = new Contacts(cloneTemplate(contctsTemplate), events);
 
-events.on('items:changed', () => {
+events.on(EventName.itemsChanged, () => {
   page.catalog = cardsData.catalog.map((item: ICard) => {
     const card = new Card(cloneTemplate(cardCatalogTemplate), {
-      onClick: () => events.emit('card:select', item),
+      onClick: () => events.emit(EventName.cardSelect, item),
       onClickButton: 'open'
     });
     return card.render(item);
@@ -49,10 +50,10 @@ events.on('items:changed', () => {
 });
 
 // Открыть карточку
-events.on('card:select', (item: ICard) => {
+events.on(EventName.cardSelect, (item: ICard) => {
   const itemInBasket = basketData.inBasket(item.id);
   const card = new Card(cloneTemplate(cardPreviewTemplate), {
-    onClick: () => events.emit('card:moveToBasket', item),
+    onClick: () => events.emit(EventName.cardMoveToBasket, item),
     onClickButton: 'basket',
     itemInBasket: itemInBasket
   });
@@ -62,7 +63,7 @@ events.on('card:select', (item: ICard) => {
 });
 
 // Добавление карточки в корзину
-events.on('card:moveToBasket', (item: ICard) => {
+events.on(EventName.cardMoveToBasket, (item: ICard) => {
   basketData.add({
     id: item.id,
     title: item.title,
@@ -72,18 +73,19 @@ events.on('card:moveToBasket', (item: ICard) => {
 });
 
 // Удаление карточки из корзины
-events.on('card:moveFromBasket', (item: TCardBasket) => {
+events.on(EventName.cardMoveFromBasket, (item: TCardBasket) => {
   basketData.delete(item);
-  events.emit('basket:open');
+  //events.emit('basket:open');
+  events.emit(EventName.basketOpen);
 });
 
 // Открытие корзины пользоватлем
-events.on('basket:open', () => {
+events.on(EventName.basketOpen, () => {
   const basket = new Basket(cloneTemplate(basketTemplate), events);
   let currentIndex: number = 0;
   basket.items = basketData.items.map((item: TCardBasket) => {
     const card = new Card(cloneTemplate(cardBasketTemplate), {
-      onClick: () => events.emit('card:moveFromBasket', item),
+      onClick: () => events.emit(EventName.cardMoveFromBasket, item),
       onClickButton: 'delete',
       basketIndex: ++currentIndex
     });
@@ -96,14 +98,15 @@ events.on('basket:open', () => {
 });
 
 // Обновление индикатора количества товаров в корзине 
-events.on('basket:changed', () => {
+events.on(EventName.basketChanged, () => {
   page.counter = basketData.items.length;
 });
 
 // Открытие формы заказа
-events.on('order:open', () => {
+events.on(EventName.orderOpen, () => {
   return modal.render({
     content: orderForm.render({
+      payment: 'online',
       address: '',
       valid: false,
       errors: []
@@ -112,14 +115,14 @@ events.on('order:open', () => {
 });
 
 // Изменилось состояние валидации формы заказа
-events.on('orderErrors:change', (errors: Partial<IOrderForm>) => {
+events.on(EventName.orderErrorsChange, (errors: Partial<IOrderForm>) => {
   const { address } = errors;
   orderForm.valid = !address;
   orderForm.errors = Object.values({address}).filter(i => !!i).join('; ');
 });
 
 // Нажатие на кнопку далее
-events.on('order:submit', () => {
+events.on(EventName.orderSubmit, () => {
   return modal.render({
     content: contactsForm.render({
       email: '',
@@ -131,7 +134,7 @@ events.on('order:submit', () => {
 });
 
 // Изменилось состояние валидации формы контактов
-events.on('contactsErrors:change', (errors: Partial<IContactsForm>) => {
+events.on(EventName.contactsErrorsChange, (errors: Partial<IContactsForm>) => {
   const { email, phone } = errors;
   contactsForm.valid = !email && !phone;
   contactsForm.errors = Object.values({ email, phone }).filter(i => !!i).join('; ');
@@ -139,29 +142,29 @@ events.on('contactsErrors:change', (errors: Partial<IContactsForm>) => {
 
 
 // Изменилось одно из полей ввода заказа
-events.on(/^order|contacts\..*:change/, (data: { field: keyof IOrderForm, value: string }) => {
+events.on(/^order|contacts\..*:change/, (data: { field: keyof Pick<IOrderForm, 'address'>, value: string }) => {
   if (data) {
     orderData.setField(data.field, data.value);
   }
 });
 
 // Изменился способ оплаты заказа на card
-events.on('order:paymentCard', () => {
+events.on(EventName.orderPaymentCard, () => {
   orderData.payment = 'online';
 });
 
 // Изменился способ оплаты заказа на cash
-events.on('order:paymentCash', () => {
+events.on(EventName.orderPaymentCash, () => {
   orderData.payment = 'offline';
 });
 
 // Заказ успешно отправлен
-events.on('contacts:submit', () => {
+events.on(EventName.contactsSubmit, () => {
   orderData.setItems(basketData.items);
   orderData.total = basketData.total;
   basketData.clear();
   const successForm = new Success(cloneTemplate(successTemplate), {
-    onClick: () => events.emit('order:success')
+    onClick: () => events.emit(EventName.orderSuccess)
   });
   api.postOrder(orderData)
     .then((data: IOrderResponce) => {
@@ -177,23 +180,22 @@ events.on('contacts:submit', () => {
 });
 
 // Нажата кнопка за новыми покупками
-events.on('order:success', () => {
+events.on(EventName.orderSuccess, () => {
+  orderData.clear();
   modal.close();
 });
 
 // Блокируем прокрутку страницы если открыта модалка
-events.on('modal:open', () => {
+events.on(EventName.modalOpen, () => {
   page.locked = true;
 });
 
 // ... и разблокируем
-events.on('modal:close', () => {
+events.on(EventName.modalClose, () => {
   page.locked = false;
 });
 
 api.getProductList()
     .then(cardsData.setCatalog.bind(cardsData))
-    .catch(err => {
-        console.error(err);
-    });
+    .catch(console.error);
 

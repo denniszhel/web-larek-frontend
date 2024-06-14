@@ -1,5 +1,5 @@
 import { ICard, IOrder, IOrderResponce } from "../types";
-import { Api, ApiListResponse } from "./base/api";
+import { Api, ApiListResponse } from "./base/Api";
 
 export class AppApi extends Api {
   readonly cdn: string;
