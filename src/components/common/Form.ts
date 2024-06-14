@@ -1,5 +1,5 @@
 import {Component} from "../base/Component";
-import {IEvents} from "../base/events";
+import {IEvents} from "../base/EventsTemp";
 import {ensureElement} from "../../utils/utils";
 
 interface IFormState {

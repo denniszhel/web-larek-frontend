@@ -1,4 +1,4 @@
-import { IEvents } from "./base/events";
+import { IEvents } from "./base/EventsTemp";
 import { ICard, IBasket, TCardBasket, IOrder, TPaymentMethod, IOrderForm, IContactsForm, FormErrors } from "../types";
 
 export class CardData implements ICard {

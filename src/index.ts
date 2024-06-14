@@ -2,7 +2,7 @@ import './scss/styles.scss';
 
 import { AppApi } from './components/AppApi';
 import { API_URL, CDN_URL } from "./utils/constants";
-import { EventEmitter } from "./components/base/events";
+import { EventEmitter } from "./components/base/EventsTemp";
 import { CardsData, BasketData, OrderData } from './components/AppData';
 import { ICard, TCardBasket, IOrderForm, IContactsForm, IOrderResponce } from './types';
 import { Page } from "./components/Page";

@@ -1,6 +1,6 @@
 import {Component} from "./base/Component";
 import {createElement, ensureElement, formatNumber} from "../utils/utils";
-import {IEvents} from "./base/events";
+import {IEvents} from "./base/EventsTemp";
 
 interface IBasketView {
     items: HTMLElement[];
@@ -50,5 +50,6 @@ export class Basket extends Component<IBasketView> {
 
     set total(total: number) {
         this.setText(this._total, `${formatNumber(total)} синапсов`);
+        this._button.disabled = total === 0;
     }
 }
